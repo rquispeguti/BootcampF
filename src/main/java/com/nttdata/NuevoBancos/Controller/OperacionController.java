@@ -20,8 +20,14 @@ public class OperacionController {
 
     @Autowired
     OperacionRepository operacionRepository;
+
+    @Autowired
     CuentaRepository cuentaRepository;
+
+    @Autowired
     CuentaServices cuentaServices;
+
+    @Autowired
     OperacionServices operacionServices;
 
     @PostMapping("/Operacion/Deposito")
@@ -39,37 +45,47 @@ public class OperacionController {
     }
 
     @PostMapping("/Operacion/Retiro")
-    public void regRetiro(@RequestBody Operacion operacion){
-        operacionRepository.save(operacion);
-        Cuenta data = cuentaRepository.findById(operacion.getOperId()).orElse(null);
-        if(data!=null)
-        {
-            data.setSaldo(data.getSaldo() - operacion.getMonto());
-            data.setCliId(data.getCliId());
+    public ResponseEntity<Object> regRetiro(@RequestBody Operacion operacion){
+        //operacionRepository.save(operacion);
+        Optional<Cuenta> cuentaOptional = cuentaServices.obtenerCuentaPornrocta(operacion.getCtaOri());
+        if (cuentaOptional.isEmpty()) {
+            return new ResponseEntity<>("La cuenta no existe", HttpStatus.NOT_FOUND);
         }
+        Cuenta cuenta = cuentaOptional.get();
+        cuenta.setSaldo(cuenta.getSaldo() - operacion.getMonto());
+        cuentaServices.saveOrUpdate(cuenta);
+        Operacion operacion1 = operacionServices.saveOrUpdate(operacion);
+        return new ResponseEntity<>(operacion, HttpStatus.CREATED);
     }
 
     @PostMapping("/Operacion/Transferencia")
-    public void regTransferencia(@RequestBody Operacion operacion){
+    public ResponseEntity<Object> regTransferencia(@RequestBody Operacion operacion){
         operacionRepository.save(operacion);
-        Cuenta data = cuentaRepository.findById(operacion.getOperId()).orElse(null);
-        if(data!=null)
-        {
-            data.setSaldo(data.getSaldo() + operacion.getMonto());
-            data.setCliId(data.getCliId());
+        Optional<Cuenta> cuentaOptional = cuentaServices.obtenerCuentaPornrocta(operacion.getCtaOri());
+        Optional<Cuenta> cuentaOptional1 = cuentaServices.obtenerCuentaPornrocta(operacion.getCtaDes());
+        if (cuentaOptional.isEmpty()) {
+            return new ResponseEntity<>("La cuenta no existe", HttpStatus.NOT_FOUND);
         }
-
-        Cuenta data1 = cuentaRepository.findById(operacion.getOperId()).orElse(null);
-        if(data!=null)
-        {
-            data1.setSaldo(data.getSaldo() - operacion.getMonto());
-            data1.setCliId(data.getCliId());
-        }
+        Cuenta cuenta = cuentaOptional.get();
+        Cuenta cuenta1 = cuentaOptional1.get();
+        cuenta.setSaldo(cuenta.getSaldo() - operacion.getMonto());
+        cuenta1.setSaldo(cuenta1.getSaldo() - operacion.getMonto());
+        cuentaServices.saveOrUpdate(cuenta);
+        cuentaServices.saveOrUpdate(cuenta1);
+        Operacion operacion1 = operacionServices.saveOrUpdate(operacion);
+        return new ResponseEntity<>(operacion, HttpStatus.CREATED);
     }
 
     @GetMapping("/Operación/Consultar/{id}")
-    public Operacion getHistorico(@PathVariable Integer id){
-        return operacionRepository.findById(id).orElse(null);
+    public Optional<Cuenta> getHistorico(@PathVariable String id){
+        Optional<Cuenta> cuentaOptional = cuentaServices.obtenerCuentaPornrocta(id);
+        return cuentaOptional;
+    }
+
+    @GetMapping("/Operación/Consultar1/{id}")
+    public Optional<Cuenta> getHistorico1(@PathVariable String id){
+        Optional<Cuenta> cuentaOptional = cuentaServices.obtenerCuentaPornrocta(id);
+        return cuentaOptional;
     }
 
 }

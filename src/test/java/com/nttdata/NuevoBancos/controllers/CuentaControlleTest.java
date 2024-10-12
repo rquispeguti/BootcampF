@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class CuentaControlleTest {
 
 
-    @Mock
+   @Mock
     private CuentaRepository cuentaRepository;
     private CuentaServices cuentaServices;
     private CuentaController cuentaController;
@@ -42,8 +42,8 @@ public class CuentaControlleTest {
 
     @Test
     @DisplayName("when add product return ok")
-    void whenAddCuentaReturnOk(){
-        Cuenta cuenta= new Cuenta();
+    void whenAddCuentaReturnOk() {
+        Cuenta cuenta = new Cuenta();
         cuenta.setCtaId(10);
         cuenta.setNrocta("555");
         cuenta.setSaldo(100.00);
@@ -54,7 +54,7 @@ public class CuentaControlleTest {
         Mono<Cuenta> resultado = cuentaServices.save(cuenta);
 
         StepVerifier.create(resultado)
-                        .expectNext(cuenta).verifyComplete();
+                .expectNext(cuenta).verifyComplete();
 
         count.post().uri("/Cuenta/Agregar")
                 .accept(MediaType.APPLICATION_JSON)
@@ -64,13 +64,13 @@ public class CuentaControlleTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(Cuenta.class)
-                .consumeWith( response ->{
+                .consumeWith(response -> {
                     Cuenta cuentas = response.getResponseBody();
-                    assertEquals(cuentas.getCtaId(),"1");
+                    assertEquals(cuentas.getCtaId(), "1");
 
                 });
-
     }
+
 
 
 }

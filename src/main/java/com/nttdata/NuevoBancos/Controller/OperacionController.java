@@ -69,7 +69,7 @@ public class OperacionController {
         Cuenta cuenta = cuentaOptional.get();
         Cuenta cuenta1 = cuentaOptional1.get();
         cuenta.setSaldo(cuenta.getSaldo() - operacion.getMonto());
-        cuenta1.setSaldo(cuenta1.getSaldo() - operacion.getMonto());
+        cuenta1.setSaldo(cuenta1.getSaldo() + operacion.getMonto());
         cuentaServices.saveOrUpdate(cuenta);
         cuentaServices.saveOrUpdate(cuenta1);
         Operacion operacion1 = operacionServices.saveOrUpdate(operacion);
